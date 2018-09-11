@@ -389,36 +389,37 @@ static int compute_frame_features(DenoiseState *st, kiss_fft_cpx *X, kiss_fft_cp
   RNN_COPY(&st->pitch_buf[PITCH_BUF_SIZE-FRAME_SIZE], in, FRAME_SIZE);
   pre[0] = &st->pitch_buf[0];
 #if defined(_FIXED_C99)
-  float xx[PITCH_BUF_SIZE >> 1];
+  opus_val16 temp_xx[PITCH_BUF_SIZE >> 1];
 #endif
-  pitch_downsample(pre, pitch_buf, 
+  pitch_downsample(pre, pitch_buf, PITCH_BUF_SIZE, 1
 #if defined(_FIXED_C99)
-  xx,
+	  , temp_xx
 #endif
-  PITCH_BUF_SIZE, 1);
+  );
 #if defined(_FIXED_C99)
-  float x_lp4[PITCH_FRAME_SIZE >> 2];
-  float y_lp4[PITCH_FRAME_SIZE >> 2];
-  float xcorr[(PITCH_MAX_PERIOD - 3 * PITCH_MIN_PERIOD) >> 1];
+  opus_val16 temp_x_lp4[PITCH_FRAME_SIZE >> 2];
+  opus_val16 temp_y_lp4[PITCH_FRAME_SIZE >> 2];
+  opus_val32 temp_xcorr[(PITCH_MAX_PERIOD - 3 * PITCH_MIN_PERIOD) >> 1];
 #endif
-  pitch_search(pitch_buf+(PITCH_MAX_PERIOD>>1), pitch_buf, 
+  pitch_search(pitch_buf+(PITCH_MAX_PERIOD>>1), pitch_buf, PITCH_FRAME_SIZE,
+      PITCH_MAX_PERIOD-3*PITCH_MIN_PERIOD, &pitch_index
 #if defined(_FIXED_C99)
-	  x_lp4,
-	  y_lp4,
-	  xcorr,
+	  , temp_x_lp4
+	  , temp_y_lp4
+	  , temp_xcorr
 #endif
-	  PITCH_FRAME_SIZE,
-      PITCH_MAX_PERIOD-3*PITCH_MIN_PERIOD, &pitch_index);
+  );
   pitch_index = PITCH_MAX_PERIOD-pitch_index;
 
 #if defined(_FIXED_C99)
-  float yy_lookup[PITCH_MAX_PERIOD+1];
+  opus_val32 temp_yy_lookup[PITCH_MAX_PERIOD+1];
 #endif
   gain = remove_doubling(pitch_buf, PITCH_MAX_PERIOD, PITCH_MIN_PERIOD,
+      PITCH_FRAME_SIZE, &pitch_index, st->last_period, st->last_gain
 #if defined(_FIXED_C99)
-	  yy_lookup,
+	  , temp_yy_lookup
 #endif
-      PITCH_FRAME_SIZE, &pitch_index, st->last_period, st->last_gain);
+  );
   st->last_period = pitch_index;
   st->last_gain = gain;
   for (i=0;i<WINDOW_SIZE;i++)

@@ -92,15 +92,18 @@ void celt_fir(
          const opus_val16 *x,
          const opus_val16 *num,
          opus_val16 *y,
-#if defined(_FIXED_C99)
-		float rnum[],
-#endif
          int N,
-         int ord)
+         int ord
+#if defined(_FIXED_C99)
+		 , opus_val16 temp_rnum[]
+#endif
+)
 {
    int i,j;
 #if !defined(_FIXED_C99)
    opus_val16 rnum[ord];
+#else
+   opus_val16 *rnum = temp_rnum;
 #endif
    for(i=0;i<ord;i++)
       rnum[i] = num[ord-i-1];
@@ -129,13 +132,14 @@ void celt_fir(
 void celt_iir(const opus_val32 *_x,
          const opus_val16 *den,
          opus_val32 *_y,
-#if defined(_FIXED_C99)
-		float rden[],
-		float y[],
-#endif
          int N,
          int ord,
-         opus_val16 *mem)
+         opus_val16 *mem
+#if defined(_FIXED_C99)
+		, opus_val16 temp_rden[]
+		, opus_val16 temp_y[]
+#endif
+		)
 {
 #ifdef SMALL_FOOTPRINT
    int i,j;
@@ -159,6 +163,9 @@ void celt_iir(const opus_val32 *_x,
 #if !defined(_FIXED_C99)
    opus_val16 rden[ord];
    opus_val16 y[N+ord];
+#else
+   opus_val16 *rden = temp_rden;
+   opus_val16 *y = temp_y;
 #endif
    for(i=0;i<ord;i++)
       rden[i] = den[ord-i-1];
@@ -212,10 +219,11 @@ int _celt_autocorr(
                    const opus_val16       *window,
                    int          overlap,
                    int          lag,
+                   int          n
 #if defined(_FIXED_C99)
-				   float		xx[],
+				  , opus_val16 temp_xx[]
 #endif
-                   int          n)
+)
 {
    opus_val32 d;
    int i, k;
@@ -224,6 +232,8 @@ int _celt_autocorr(
    const opus_val16 *xptr;
 #if !defined(_FIXED_C99)
    opus_val16 xx[n];
+#else
+   opus_val16 *xx = temp_xx;
 #endif
    celt_assert(n>0);
    celt_assert(overlap>=0);

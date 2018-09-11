@@ -146,10 +146,11 @@ static void celt_fir5(const opus_val16 *x,
 
 
 void pitch_downsample(celt_sig *x[], opus_val16 *x_lp,
+      int len, int C
 #if defined(_FIXED_C99)
-	  float xx[],
+	  , opus_val16 temp_xx[]
 #endif
-      int len, int C)
+)
 {
    int i;
    opus_val32 ac[5];
@@ -183,11 +184,11 @@ void pitch_downsample(celt_sig *x[], opus_val16 *x_lp,
       x_lp[0] += SHR32(HALF32(HALF32(x[1][1])+x[1][0]), shift);
    }
 
-   _celt_autocorr(x_lp, ac, NULL, 0, 4,
+   _celt_autocorr(x_lp, ac, NULL, 0, 4, len>>1
 #if defined(_FIXED_C99)
-	   xx,
+	   , temp_xx
 #endif 
-	   len>>1);
+	   );
 
 
    /* Noise floor -40 dB */
@@ -287,15 +288,13 @@ void celt_pitch_xcorr(const opus_val16 *_x, const opus_val16 *_y,
 #endif
 }
 
-void pitch_search(const opus_val16 *x_lp, opus_val16 *y,
+void pitch_search(const opus_val16 *x_lp, opus_val16 *y, int len, int max_pitch, int *pitch
 #if defined(_FIXED_C99)
-					float x_lp4[],
-					float y_lp4[],
-					float xcorr[],
+	, opus_val16 temp_x_lp4[]
+	, opus_val16 temp_y_lp4[]
+	, opus_val32 temp_xcorr[]
 #endif
-					int len,
-					int max_pitch, 
-					int *pitch)
+)
 {
    int i, j;
    int lag;
@@ -315,6 +314,10 @@ void pitch_search(const opus_val16 *x_lp, opus_val16 *y,
    opus_val16 x_lp4[len>>2];
    opus_val16 y_lp4[lag>>2];
    opus_val32 xcorr[max_pitch>>1];
+#else
+   opus_val16 *x_lp4 = temp_x_lp4;
+   opus_val16 *y_lp4 = temp_y_lp4;
+   opus_val32 *xcorr = temp_xcorr;
 #endif
 
    /* Downsample by 2 again */
@@ -437,10 +440,11 @@ static opus_val16 compute_pitch_gain(opus_val32 xy, opus_val32 xx, opus_val32 yy
 
 static const int second_check[16] = {0, 0, 3, 2, 3, 2, 5, 2, 3, 2, 3, 2, 5, 2, 3, 2};
 opus_val16 remove_doubling(opus_val16 *x, int maxperiod, int minperiod, 
+      int N, int *T0_, int prev_period, opus_val16 prev_gain
 #if defined(_FIXED_C99)
-	  float yy_lookup[],
+	, opus_val32 temp_yy_lookup[]
 #endif
-      int N, int *T0_, int prev_period, opus_val16 prev_gain)
+)
 {
    int k, i, T, T0;
    opus_val16 g, g0;
@@ -465,6 +469,8 @@ opus_val16 remove_doubling(opus_val16 *x, int maxperiod, int minperiod,
 
 #if !defined(_FIXED_C99)
    opus_val32 yy_lookup[maxperiod+1];
+#else
+   opus_val32 *yy_lookup = temp_yy_lookup;
 #endif
    dual_inner_prod(x, x, x-T0, N, &xx, &xy);
    yy_lookup[0] = xx;
