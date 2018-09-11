@@ -44,16 +44,29 @@ void celt_fir(
          const opus_val16 *num,
          opus_val16 *y,
          int N,
-         int ord);
+         int ord
+#if defined(_FIXED_C99)
+		 , opus_val16 temp_rnum[]
+#endif
+);
 
 void celt_iir(const opus_val32 *x,
          const opus_val16 *den,
          opus_val32 *y,
          int N,
          int ord,
-         opus_val16 *mem);
+         opus_val16 *mem
+#if defined(_FIXED_C99)
+		, opus_val16 temp_rden[]
+		, opus_val16 temp_y[]
+#endif
+);
 
 int _celt_autocorr(const opus_val16 *x, opus_val32 *ac,
-         const opus_val16 *window, int overlap, int lag, int n);
+         const opus_val16 *window, int overlap, int lag, int n
+#if defined(_FIXED_C99)
+		, opus_val16 temp_xx[]
+#endif
+);
 
 #endif /* PLC_H */

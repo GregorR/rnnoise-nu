@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\src\celt_lpc.c" />
+    <ClCompile Include="..\..\src\denoise.c" />
+    <ClCompile Include="..\..\src\kiss_fft.c" />
+    <ClCompile Include="..\..\src\models.c" />
+    <ClCompile Include="..\..\src\pitch.c" />
+    <ClCompile Include="..\..\src\rnn.c" />
+    <ClCompile Include="..\..\src\rnn_data.c" />
+    <ClCompile Include="..\..\src\rnn_reader.c" />
+  </ItemGroup>
+</Project>
