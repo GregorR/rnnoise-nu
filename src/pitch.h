@@ -39,12 +39,21 @@
 #include "arch.h"
 
 void pitch_downsample(celt_sig *x[], opus_val16 *x_lp,
+#if defined(_FIXED_C99)
+	  float xx[],
+#endif
       int len, int C);
 
 void pitch_search(const opus_val16 *x_lp, opus_val16 *y,
+#if defined(_FIXED_C99)
+				  float x_lp4[], float y_lp4[], float xcorr[],
+#endif
                   int len, int max_pitch, int *pitch);
 
 opus_val16 remove_doubling(opus_val16 *x, int maxperiod, int minperiod,
+#if defined(_FIXED_C99)
+	  float yy_lookup[],
+#endif
       int N, int *T0, int prev_period, opus_val16 prev_gain);
 
 
